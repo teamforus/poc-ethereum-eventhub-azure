@@ -1,3 +1,7 @@
+**note:** work in progress, beware of the dragons 🐉 
+
+**This repository is maintained by:** [@martijndoornik](https://github.com/martijndoornik)
+
 # Azure EventHub implementation
 
 This package contains the implementation of the Azure EventHub.
