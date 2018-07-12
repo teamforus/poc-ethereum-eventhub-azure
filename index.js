@@ -27,8 +27,7 @@ var version = {};
 
 module.exports = 
 {
-    'configure':
-    function configure(config, packageInfo) {
+    'configure': (config, packageInfo) => {
         if (configSelector in config) {
             const eventHubConfig = config[configSelector];
             if (!configConnectionStringSelector in eventHubConfig) throw 'No connectionString in EventHub config';
@@ -58,8 +57,10 @@ module.exports =
             }));
         } catch (e) { console.log(e); }
     },
-    'send': 
-    function send(name, data, previousEvent) {
+    'error': (messages, cause) => {
+        sendStatusResponse(eventListData.STATUS_CODES.ERROR, messages, cause);
+    },
+    'send': (name, data, previousEvent) => {
         requireConfigure()
         var body = {}
         body[eventNameKey] = name;
@@ -72,15 +73,15 @@ module.exports =
         message[bodyKey] = body;
         return client.send(message, partitionId);
     },
-    'start': 
-    function start(onEvent) {
-        requireConfigure()
-        const onError = function(error) {
-            console.log('Error: ' + error)
+    'start': (onEvent, onError, onStatusRequest, onVersionRequest) => {
+        requireConfigure();
+        if (!onError) onError = (error) => {
+            module.exports.error(error);
         }
         const onMessage = function(message) {
             try {
                 const time = parseInt(message['annotations']['x-opt-enqueued-time']);
+                // Check if event had happened _or not_
                 if (time > lastEvent) {
                     lastEvent = time;
                     saveLastEvent(time);
@@ -89,10 +90,18 @@ module.exports =
                         var name = body[eventNameKey];
                         var data = body[eventDataKey];
                         if (name === eventList.STATUS_REQUEST) {
-                            sendStatusResponse(body);
+                            if (!!onStatusRequest) {
+                                onStatusRequest(body);
+                            } else {
+                                sendStatusResponse(body);
+                            }
                         }
                         if (name === eventList.VERSION_REQUEST) {
-                            sendVersionResponse(body);
+                            if (!!onVersionRequest) {
+                                onVersionRequest(body) 
+                            } else {
+                                sendVersionResponse(body);
+                            }
                         }
                         onEvent(name, data, time);
                     }
@@ -104,10 +113,10 @@ module.exports =
         receiver = client.receive(partitionId, onMessage, onError);
     },
     
-    'stop':
-    function stop() {
+    'stop': () => {
         requireConfigure();
         if (receiver) {
+            sendStatusResponse(eventListData.STATUS_CODES.OFFLINE, 'eventHub.stop was called.')
             receiver.stop();
         }
     }
@@ -123,9 +132,17 @@ function saveLastEvent(timeUnix) {
     });
 }
 
-function sendStatusResponse(previousEvent) {
+/**
+ * 
+ * @param {String} statusCode As per EventHubDataList.STATUS_CODES
+ * @param {String|Array} messages String or array of strings with additional info regarding the status. Note: these will not be taken into account when the StatusCode is OK.
+ * @param {Object} previousEvent 
+ */
+function sendStatusResponse(statusCode, messages, previousEvent) {
     data = {};
-    data[eventListData.STATUS_CODE] = eventListData.STATUS_CODES.OK;
+    data[eventListData.STATUS_CODE] = statusCode;
+    if (statusCode !== eventListData.STATUS_CODES.OK && !!messages) 
+        data[eventListData.ERROR_MESSAGE] = messages;
     module.exports.send(eventList.STATUS_RESPONSE, data, previousEvent);
 }
 

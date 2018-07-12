@@ -30,16 +30,23 @@ const eventHub = require('event-hub');
 // Optional, but useful
 const config = require('config.json');
 
-// This must be done first
+// This must be done first. `config` is a json-object or file, as
+// described above.
 eventHub.configure(config);
 
 // Start listening using the configuration given above
-// onEvent is a function which accepts eventName and optional
+// `onEvent` is a function which accepts eventName and optional
 // eventData.
 eventHub.start(onEvent)
 
 // Send a message to the Azure EventHub
 eventHub.send(eventName, eventData);
+
+// Report an error in the listener. The `messages` parameter
+// is either a string, or an array of strings, allowing you to
+// provide a stacktrace in order to help a developer debug the issue.
+// The `cause` parameter is the event that causes the error to occur.
+eventHub.error(messages, cause);
 
 // Stop listening
 eventHub.stop();
