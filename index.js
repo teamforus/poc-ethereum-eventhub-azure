@@ -93,7 +93,7 @@ module.exports =
                             if (!!onStatusRequest) {
                                 onStatusRequest(body);
                             } else {
-                                sendStatusResponse(body);
+                                sendStatusResponse(eventListData.STATUS_CODES.OK, [], body);
                             }
                         }
                         if (name === eventList.VERSION_REQUEST) {
