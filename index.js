@@ -111,6 +111,7 @@ module.exports =
              }
         }
         receiver = client.receive(partitionId, onMessage, onError);
+        sendVersionResponse();
     },
     
     'stop': () => {
