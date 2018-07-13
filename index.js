@@ -76,7 +76,8 @@ module.exports =
     'start': (onEvent, onError, onStatusRequest, onVersionRequest) => {
         requireConfigure();
         if (!onError) onError = (error) => {
-            module.exports.error(error);
+            console.log(error);
+            module.exports.error(eventListData.STATUS_CODES.ERROR, error);
         }
         const onMessage = function(message) {
             try {
