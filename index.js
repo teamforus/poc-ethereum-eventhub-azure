@@ -121,6 +121,16 @@ module.exports =
             sendStatusResponse(eventListData.STATUS_CODES.OFFLINE, 'eventHub.stop was called.')
             receiver.stop();
         }
+    },
+
+    'web3Provider': {
+        send: (
+            payload,
+            callback
+        ) => {
+            requireConfigure();
+            module.exports.send('testRequest', payload);
+        }
     }
 }
 
