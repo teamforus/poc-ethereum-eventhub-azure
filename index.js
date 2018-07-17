@@ -11,7 +11,7 @@ const configSelector = 'eventHub';
 const configEventHubNameSelector = 'eventHubName';
 const configConnectionStringSelector = 'connectionString';
 
-const eventList = require('./../event-list');
+const eventList = require('event-list');
 const eventListData = eventList.Data;
 const eventNameKey = eventListData.EVENT_NAME;
 const eventDataKey = eventListData.EVENT_DATA;

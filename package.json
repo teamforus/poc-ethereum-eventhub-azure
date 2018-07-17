@@ -1,7 +1,7 @@
 {
   "name": "event-hub",
   "version": "1.0.0",
-  "description": "Event hub dependancy for the Forus backend",
+  "description": "Event hub dependency for the Forus backend",
   "main": "index.js",
   "scripts": {
     "test": "test"
@@ -9,6 +9,7 @@
   "author": "Martijn Doornik",
   "license": "ISC",
   "dependencies": {
-    "azure-event-hubs": "^0.2.2"
+    "event-list": "git://github.com/teamforus/rd-ethereum-eventhub-list.git#master",
+    "azure-event-hubs": "^0.2.4"
   }
 }
