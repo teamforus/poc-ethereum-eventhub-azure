@@ -123,15 +123,21 @@ module.exports =
         }
     },
 
-    'web3Provider': {
-        send: (
-            payload,
-            callback
-        ) => {
-            requireConfigure();
-            module.exports.send('testRequest', payload);
+    'web3Provider': (config, packageJson) => {
+        module.exports.configure(config, packageJson);
+        return {
+            send: (
+                payload,
+                callback
+            ) => {
+                requireConfigure();
+                module.exports.send('testRequest', payload);
+            }
         }
-    }
+    } 
+    
+    
+    
 }
 
 function requireConfigure() {
